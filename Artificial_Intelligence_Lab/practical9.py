@@ -1,37 +1,45 @@
-# Assume:
-# Board is 3×3; players are X and O.
-# X is the maximizer; O is minimizer.
-# Utility: +1 if X wins; −1 if O wins; 0 if draw.
+import math
 
-function minimax(board, player):
-    if terminal(board):
-        return utility(board)  # +1, −1, or 0
+def minimax(board, depth, is_maximizing):
+    if check_winner(board, "O"):
+        return -1
+    elif check_winner(board, "X"):
+        return 1
+    elif check_tie(board):
+        return 0
 
-    if player == X:  # Maximizer
-        bestVal = -∞
-        for each legal_move in board:
-            newBoard = apply_move(board, legal_move, X)
-            val = minimax(newBoard, O)
-            if val > bestVal:
-                bestVal = val
-        return bestVal
-    else:  # player == O, minimizer
-        bestVal = +∞
-        for each legal_move in board:
-            newBoard = apply_move(board, legal_move, O)
-            val = minimax(newBoard, X)
-            if val < bestVal:
-                bestVal = val
-        return bestVal
+    if is_maximizing:
+        best_score = -math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == "":
+                    board[i][j] = "X"
+                    score = minimax(board, depth + 1, False)
+                    board[i][j] = ""
+                    best_score = max(score, best_score)
+        return best_score
+    else:
+        best_score = math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == "":
+                    board[i][j] = "O"
+                    score = minimax(board, depth + 1, True)
+                    board[i][j] = ""
+                    best_score = min(score, best_score)
+        return best_score
 
-function findBestMove(board):
-    bestMove = null
-    bestVal = -∞
-    for each legal_move in board:
-        newBoard = apply_move(board, legal_move, X)
-        val = minimax(newBoard, O)
-        if val > bestVal:
-            bestVal = val
-            bestMove = legal_move
-    return bestMove
+def best_move(board):
+    best_score = -math.inf
+    move = (-1, -1)
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == "":
+                board[i][j] = "X"
+                score = minimax(board, 0, False)
+                board[i][j] = ""
+                if score > best_score:
+                    best_score = score
+                    move = (i, j)
+    return move
 
